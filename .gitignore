@@ -1,0 +1,14 @@
+# Environment
+.env
+venv/
+
+# Python
+__pycache__/
+*.pyc
+
+# Trained model artifacts — regenerate by running the training notebooks
+# (Module 6, Module 8) rather than committing large binaries to git.
+# model.safetensors alone is ~265MB, over GitHub's 100MB file limit.
+nlp/my_finetuned_distilbert/
+nlp/amount_ner_model/
+*.zip

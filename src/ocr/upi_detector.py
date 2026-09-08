@@ -1,3 +1,4 @@
+import base64
 import logging
 from pathlib import Path
 

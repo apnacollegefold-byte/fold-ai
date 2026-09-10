@@ -5,7 +5,7 @@ import api.config
 import logging
 from fastapi import APIRouter, HTTPException, Depends, Body, UploadFile, File
 from api.middleware.clerk_auth import get_current_user
-from api.services.extraction_service import nlp
+from api.services.extraction_service import nlp, extract_from_image
 from api.services import ledger_service
 from stt.transcriber import transcribe_audio
 
@@ -120,6 +120,35 @@ async def extract_and_save_audio(
         }
     except Exception as e:
         _logger.exception("Audio extraction failed")
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
+
+@router.post("/image")
+async def extract_and_save_image(
+    file: UploadFile = File(...),
+    user_info: dict = Depends(get_current_user),
+):
+
+    tmp_path = await _save_upload_to_temp(file, ".jpg")
+    try:
+        extracted = extract_from_image(tmp_path)
+        ledger_result, message = _save_transaction(
+            user_info["user_ref"],
+            "web_image",
+            f"{extracted['category']} from receipt",
+            extracted,
+            raw_text=extracted.get("raw_text"),
+        )
+        return {
+            "source": "image",
+            "extracted_data": extracted,
+            "ledger_result": ledger_result,
+            "message": message,
+        }
+    except Exception as e:
+        _logger.exception("Image extraction failed")
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         if os.path.exists(tmp_path):

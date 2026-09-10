@@ -1,14 +1,3 @@
-"""
-FastAPI Application Entry Point
-================================
-Boots the API server and initializes the Postgres schema on startup.
-CORS and static frontend serving get added in Module 19, once there's
-an actual frontend to serve — not needed yet.
-
-Run with:
-    uvicorn src.api.main:app --reload --port 8000
-"""
-
 import os
 import sys
 
@@ -22,6 +11,7 @@ import api.config  # noqa: F401 -- loads .env as a side effect
 
 from fastapi import FastAPI
 from api.db.connection import run_migrations
+from api.controllers.extraction_controller import router as extraction_router
 
 # ─── Create Application ─────────────────────────────────────────────────
 app = FastAPI(
@@ -33,6 +23,8 @@ app = FastAPI(
     ),
     version="1.0.0",
 )
+
+app.include_router(extraction_router)
 
 
 @app.on_event("startup")

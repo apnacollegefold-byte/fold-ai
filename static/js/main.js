@@ -1,4 +1,5 @@
 import { initChatPage } from './pages/chat.js';
+import { initTransactionsPage } from './pages/transactions.js';
 
 function bootstrap() {
     const appDiv = document.getElementById('app');
@@ -38,7 +39,7 @@ function navigate() {
     // Initialize page-specific logic — filled in module by module.
     switch (hash) {
         case 'chat':         initChatPage();         break;  // Module 20
-        // case 'transactions': initTransactionsPage(); break;  // Module 21
+        case 'transactions': initTransactionsPage(); break;  // Module 21
         // case 'reports':      initReportsPage();      break;  // Module 22
         // 'landing' and 'accounts' need no JS logic yet
     }

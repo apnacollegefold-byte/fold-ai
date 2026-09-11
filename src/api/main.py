@@ -12,6 +12,7 @@ import api.config  # noqa: F401 -- loads .env as a side effect
 from fastapi import FastAPI
 from api.db.connection import run_migrations
 from api.controllers.extraction_controller import router as extraction_router
+from api.controllers.web_controller import router as web_router
 
 from fastapi.staticfiles import StaticFiles
 
@@ -27,6 +28,7 @@ app = FastAPI(
 )
 
 app.include_router(extraction_router)
+app.include_router(web_router)
 
 
 @app.on_event("startup")

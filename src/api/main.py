@@ -13,6 +13,8 @@ from fastapi import FastAPI
 from api.db.connection import run_migrations
 from api.controllers.extraction_controller import router as extraction_router
 
+from fastapi.staticfiles import StaticFiles
+
 # ─── Create Application ─────────────────────────────────────────────────
 app = FastAPI(
     title="Fold — Financial Ledger Extraction API",
@@ -39,6 +41,8 @@ async def health_check():
     """Simple health check endpoint."""
     return {"status": "healthy", "service": "fold-extraction-api"}
 
+STATIC_DIR = os.path.join(os.path.dirname(SRC_DIR), "static")
+app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
 
 # ─── Direct Launch ──────────────────────────────────────────────────────
 if __name__ == "__main__":

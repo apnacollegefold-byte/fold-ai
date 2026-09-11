@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fold — AI Financial Ledger</title>
+    <meta name="description" content="Multi-modal AI financial ledger. Add transactions via text, voice, or receipt image.">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ============================================================ -->
+    <!-- GLOBAL BACKGROUND PATTERNS & EFFECTS                         -->
+    <!-- ============================================================ -->
+    <div class="grid-overlay"></div>
+    <div class="glow-teal-top-left"></div>
+    <div class="glow-teal-bottom-right"></div>
+
+    <!-- ============================================================ -->
+    <!-- APP ROOT — everything renders here                           -->
+    <!-- ============================================================ -->
+    <div id="app">
+        <p class="loading-text">Loading…</p>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- APP SHELL — nav + page container                             -->
+    <!-- No auth gating yet (Clerk arrives in Module 23-24) — main.js -->
+    <!-- shows this shell directly on load.                           -->
+    <!-- ============================================================ -->
+    <template id="tpl-shell">
+        <nav class="top-nav">
+            <a href="#landing" class="nav-brand">Fold AI</a>
+            <div class="nav-links">
+                <a href="#chat" class="nav-link" data-page="chat">💬 Chat</a>
+                <a href="#transactions" class="nav-link" data-page="transactions">📋 Transactions</a>
+                <a href="#accounts" class="nav-link" data-page="accounts">🏦 Accounts</a>
+                <a href="#reports" class="nav-link" data-page="reports">📊 Reports</a>
+            </div>
+        </nav>
+        <main id="page-container"></main>
+    </template>
+
+    <!-- ============================================================ -->
+    <!-- PAGE: Landing                                                -->
+    <!-- ============================================================ -->
+    <template id="tpl-landing">
+        <section class="page landing-page">
+            <div class="hero-section">
+                <div class="hero-intro">
+                    <h2 class="hero-intro-title">It's just money, after-all.</h2>
+                    <p class="hero-intro-subtitle">A few good habits, some awareness, and tools that don't make you feel dumb have the power to change everything.</p>
+                </div>
+                <div class="coin-container">
+                    <div class="coin">
+                        <img src="/assests/coin1.png" alt="Indian Rupee Coin Front" class="coin-face coin-front">
+                        <img src="/assests/coin2.png" alt="Indian Rupee Coin Back" class="coin-face coin-back">
+                    </div>
+                </div>
+                <div class="hero-main-grid">
+                    <div class="hero-content">
+                        <h1>Stop recording expenses manually.</h1>
+                        <p class="hero-desc">Fold automatically categorizes your expenses. Upload receipts, record voice notes, or simply type. Focus on what matters.</p>
+                        <a href="#chat" class="btn primary btn-hero-cta">Start Tracking →</a>
+                    </div>
+                    <div class="hero-visual">
+                        <div class="hero-image-wrapper">
+                            <img src="/assests/hero-demo.png" alt="Fold AI Dashboard Interface Screenshot" class="hero-demo-img">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </template>
+
+    <!-- ============================================================ -->
+    <!-- PAGE: Chat (Add Transaction) — markup only, JS in Module 20  -->
+    <!-- ============================================================ -->
+    <template id="tpl-chat">
+        <section class="page chat-page">
+            <h2>Add Transaction</h2>
+            <div class="input-card">
+                <textarea id="text-input" placeholder="Type your transaction (e.g. Spent 500 on groceries via UPI)…"></textarea>
+                <div class="action-buttons">
+                    <button id="record-btn" class="btn secondary">🎤 Record Audio</button>
+                    <label for="image-input" class="btn secondary">📷 Upload Receipt</label>
+                    <input type="file" id="image-input" accept="image/*" style="display:none;">
+                    <button id="send-btn" class="btn primary">Send</button>
+                </div>
+            </div>
+            <div id="status-area"></div>
+            <div id="result-area"></div>
+        </section>
+    </template>
+
+    <!-- ============================================================ -->
+    <!-- PAGE: Transactions — markup only, JS in Module 21            -->
+    <!-- ============================================================ -->
+    <template id="tpl-transactions">
+        <section class="page transactions-page">
+            <h2>Transaction History</h2>
+            <div id="tx-loading" class="loading-text">Loading transactions…</div>
+            <table id="tx-table" class="data-table" style="display:none;">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th>Amount (₹)</th>
+                        <th>Method</th>
+                    </tr>
+                </thead>
+                <tbody id="tx-body"></tbody>
+            </table>
+            <p id="tx-empty" style="display:none;" class="empty-msg">No transactions yet. <a href="#chat">Add one now →</a></p>
+        </section>
+    </template>
+
+    <!-- ============================================================ -->
+    <!-- PAGE: Accounts — markup only, no dedicated module yet        -->
+    <!-- ============================================================ -->
+    <template id="tpl-accounts">
+        <section class="page accounts-page">
+            <h2>Bank Accounts</h2>
+            <div class="add-account-form input-card">
+                <h3>Add Account</h3>
+                <div class="form-row">
+                    <input type="text" id="acc-name" placeholder="Account name (e.g. HDFC Savings)">
+                    <select id="acc-type">
+                        <option value="bank">Bank</option>
+                        <option value="cash">Cash</option>
+                        <option value="credit">Credit Card</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <input type="text" id="acc-institution" placeholder="Institution (optional)">
+                    <input type="text" id="acc-last4" placeholder="Last 4 digits (optional)" maxlength="4">
+                    <input type="number" id="acc-balance" placeholder="Opening balance (₹)" step="0.01">
+                </div>
+                <button id="acc-add-btn" class="btn primary">Add Account</button>
+                <div id="acc-status"></div>
+            </div>
+            <div id="acc-loading" class="loading-text">Loading accounts…</div>
+            <div id="acc-list"></div>
+        </section>
+    </template>
+
+    <!-- ============================================================ -->
+    <!-- PAGE: Reports — markup only, JS + Chart.js in Module 22      -->
+    <!-- ============================================================ -->
+    <template id="tpl-reports">
+        <section class="page reports-page">
+            <h2>Financial Reports</h2>
+            <div class="report-controls">
+                <select id="report-period">
+                    <option value="monthly">This Month</option>
+                    <option value="weekly">Last 7 Days</option>
+                </select>
+                <button id="report-refresh" class="btn secondary">Refresh</button>
+            </div>
+            <div id="report-loading" class="loading-text">Loading report…</div>
+            <div id="report-content" style="display:none;">
+                <div class="summary-cards" id="summary-cards"></div>
+            </div>
+        </section>
+    </template>
+
+    <!-- Entry point -->
+    <script type="module" src="/js/main.js"></script>
+</body>
+</html>

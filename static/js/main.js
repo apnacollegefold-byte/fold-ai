@@ -1,17 +1,45 @@
+import { initAuth } from './auth.js';
 import { initChatPage } from './pages/chat.js';
 import { initTransactionsPage } from './pages/transactions.js';
+import { initAccountsPage } from './pages/accounts.js';
 import { initReportsPage } from './pages/report.js';
 
+let clerk = null;
 
-function bootstrap() {
-    const appDiv = document.getElementById('app');
-    showShell(appDiv);
+async function bootstrap() {
+    try {
+        clerk = await initAuth();
+        const appDiv = document.getElementById('app');
+
+        if (clerk.isSignedIn) {
+            showShell(appDiv);
+        } else {
+            showAuth(appDiv);
+        }
+    } catch (err) {
+        console.error('Bootstrap failed:', err);
+        document.getElementById('app').innerHTML =
+            '<p class="loading-text">Error loading app. Check console.</p>';
+    }
+}
+
+function showAuth(appDiv) {
+    appDiv.innerHTML = '';
+    const tpl = document.getElementById('tpl-auth');
+    appDiv.appendChild(tpl.content.cloneNode(true));
+
+    const signInDiv = document.getElementById('clerk-sign-in');
+    clerk.mountSignIn(signInDiv);
 }
 
 function showShell(appDiv) {
     appDiv.innerHTML = '';
     const tpl = document.getElementById('tpl-shell');
     appDiv.appendChild(tpl.content.cloneNode(true));
+
+    // Mount Clerk's user menu (avatar, sign out)
+    const userBtnDiv = document.getElementById('user-button');
+    clerk.mountUserButton(userBtnDiv);
 
     window.addEventListener('hashchange', navigate);
     navigate(); // handle initial hash
@@ -40,9 +68,10 @@ function navigate() {
 
     // Initialize page-specific logic — filled in module by module.
     switch (hash) {
-        case 'chat':         initChatPage();         break;  // Module 20
-        case 'transactions': initTransactionsPage(); break;  // Module 21
-        case 'reports':      initReportsPage();      break;  // Module 22
+        case 'chat':         initChatPage();         break;  
+        case 'transactions': initTransactionsPage(); break;  
+        case 'accounts':     initAccountsPage();     break;
+        case 'reports':      initReportsPage();      break;  
         // 'landing' and 'accounts' need no JS logic yet
     }
 }

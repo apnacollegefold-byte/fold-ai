@@ -9,6 +9,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script
+        async
+        crossorigin="anonymous"
+        data-clerk-publishable-key="pk_test_d29ydGh5LWhhbXN0ZXItMTUuY2xlcmsuYWNjb3VudHMuZGV2JA"
+        src="https://worthy-hamster-15.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js"
+        type="text/javascript"
+    ></script>
 </head>
 <body>
 
@@ -23,13 +30,24 @@
     <!-- APP ROOT — everything renders here                           -->
     <!-- ============================================================ -->
     <div id="app">
-        <p class="loading-text">Loading…</p>
+        <p class="loading-text">Loading securely…</p>
     </div>
 
     <!-- ============================================================ -->
-    <!-- APP SHELL — nav + page container                             -->
-    <!-- No auth gating yet (Clerk arrives in Module 23-24) — main.js -->
-    <!-- shows this shell directly on load.                           -->
+    <!-- AUTH SCREEN (shown when logged out)                          -->
+    <!-- ============================================================ -->
+    <template id="tpl-auth">
+        <div class="auth-screen">
+            <div class="auth-card">
+                <h1>Fold</h1>
+                <p class="auth-subtitle">AI-Powered Financial Ledger</p>
+                <div id="clerk-sign-in"></div>
+            </div>
+        </div>
+    </template>
+
+    <!-- ============================================================ -->
+    <!-- APP SHELL (shown when logged in) — nav + page container      -->
     <!-- ============================================================ -->
     <template id="tpl-shell">
         <nav class="top-nav">
@@ -40,6 +58,9 @@
                 <a href="#accounts" class="nav-link" data-page="accounts">🏦 Accounts</a>
                 <a href="#reports" class="nav-link" data-page="reports">📊 Reports</a>
             </div>
+            <div class="nav-actions">
+                <div id="user-button"></div>
+            </div>
         </nav>
         <main id="page-container"></main>
     </template>
@@ -49,17 +70,24 @@
     <!-- ============================================================ -->
     <template id="tpl-landing">
         <section class="page landing-page">
+            
+            <!-- SECTION 2: Hero Section -->
             <div class="hero-section">
+                <!-- Introductory Text -->
                 <div class="hero-intro">
                     <h2 class="hero-intro-title">It's just money, after-all.</h2>
                     <p class="hero-intro-subtitle">A few good habits, some awareness, and tools that don't make you feel dumb have the power to change everything.</p>
                 </div>
+
+                <!-- Animated Coin Container (3D Flip Effect) -->
                 <div class="coin-container">
                     <div class="coin">
                         <img src="/assests/coin1.png" alt="Indian Rupee Coin Front" class="coin-face coin-front">
                         <img src="/assests/coin2.png" alt="Indian Rupee Coin Back" class="coin-face coin-back">
                     </div>
                 </div>
+
+                <!-- Main Hero Grid Column split -->
                 <div class="hero-main-grid">
                     <div class="hero-content">
                         <h1>Stop recording expenses manually.</h1>
@@ -73,6 +101,266 @@
                     </div>
                 </div>
             </div>
+
+            <!-- SECTION 3: How It Works (Zigzag Flow) -->
+            <div class="how-it-works-section">
+                <div class="section-header">
+                    <h2>Track spending in 30 seconds.</h2>
+                    <p class="section-subheader">Fold turns messy receipts, UPI screenshots, and quick voice notes into clean, categorized transactions.</p>
+                </div>
+
+                <!-- Step 1: Add Expense (Image Left, Text Right) -->
+                <div class="step-card zigzag-step">
+                    <div class="step-visual">
+                        <span class="step-badge">01</span>
+                        <img src="/assests/expense.png" alt="Upload and capture screen mockup" class="step-img">
+                    </div>
+                    <div class="step-content">
+                        <h3>Add an expense</h3>
+                        <p>Type, upload an image, or record audio. Hinglish is supported. Fold extracts details instantly.</p>
+                    </div>
+                </div>
+
+                <!-- Animated Dashed Connector Line -->
+                <div class="connector-line"></div>
+
+                <!-- Step 2: AI Extracts (Text Left, Image Right) -->
+                <div class="step-card zigzag-step reverse">
+                    <div class="step-content">
+                        <h3>AI extracts the details</h3>
+                        <p>Amount, merchant, payment method, cash-flow — all structured automatically by our OCR & NLP models.</p>
+                    </div>
+                    <div class="step-visual">
+                        <span class="step-badge">02</span>
+                        <img src="/assests/ai_extraction.png" alt="AI extraction metadata display" class="step-img">
+                    </div>
+                </div>
+
+                <!-- Animated Dashed Connector Line -->
+                <div class="connector-line"></div>
+
+                <!-- Step 3: Instant Clarity (Image Left, Text Right) -->
+                <div class="step-card zigzag-step">
+                    <div class="step-visual">
+                        <span class="step-badge">03</span>
+                        <img src="/assests/detailed_records.png" alt="Detailed spending breakdowns reports screen" class="step-img">
+                    </div>
+                    <div class="step-content">
+                        <h3>Get instant clarity</h3>
+                        <p>See categories, trends, and top spends across weekly or monthly views in real-time dashboards.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 4: Built for India -->
+            <div class="built-for-india-section">
+                <div class="india-badge-header">
+                    <span class="decorative-line"></span>
+                    <span class="badge-text">BUILT FOR INDIA</span>
+                    <span class="decorative-line"></span>
+                </div>
+
+                <!-- Horizontal Infinite Chip Marquee -->
+                <div class="marquee-scroller">
+                    <div class="marquee-track">
+                        <!-- Duplicate lists ensure seamless loop styling -->
+                        <span class="marquee-chip"><span class="chip-dot"></span>UPI screenshots</span>
+                        <span class="marquee-chip"><span class="chip-dot"></span>Receipt OCR</span>
+                        <span class="marquee-chip"><span class="chip-dot"></span>Hinglish voice notes</span>
+                        <span class="marquee-chip"><span class="chip-dot"></span>Auto categorization</span>
+                        <span class="marquee-chip"><span class="chip-dot"></span>Cash flow detection</span>
+                        <span class="marquee-chip"><span class="chip-dot"></span>Merchant extraction</span>
+                        <span class="marquee-chip"><span class="chip-dot"></span>Bank + wallet support</span>
+                        <span class="marquee-chip"><span class="chip-dot"></span>Export anytime</span>
+                        <!-- Seamless repeat -->
+                        <span class="marquee-chip"><span class="chip-dot"></span>UPI screenshots</span>
+                        <span class="marquee-chip"><span class="chip-dot"></span>Receipt OCR</span>
+                        <span class="marquee-chip"><span class="chip-dot"></span>Hinglish voice notes</span>
+                        <span class="marquee-chip"><span class="chip-dot"></span>Auto categorization</span>
+                        <span class="marquee-chip"><span class="chip-dot"></span>Cash flow detection</span>
+                        <span class="marquee-chip"><span class="chip-dot"></span>Merchant extraction</span>
+                        <span class="marquee-chip"><span class="chip-dot"></span>Bank + wallet support</span>
+                        <span class="marquee-chip"><span class="chip-dot"></span>Export anytime</span>
+                    </div>
+                </div>
+
+                <!-- 4-Card Feature Grid -->
+                <div class="feature-cards-grid">
+                    <!-- Feature Card 1 -->
+                    <div class="feature-grid-card">
+                        <img src="/assests/multi_input.png" alt="Multi-input channel icon" class="feature-card-icon">
+                        <h4>Multi-input</h4>
+                        <p class="short-desc">Type, upload, or speak — all in one place.</p>
+                        <p class="extended-desc">Seamlessly add expenses through text, voice notes in Hinglish, or by uploading receipt images. Choose the method that works best for you in the moment.</p>
+                    </div>
+                    <!-- Feature Card 2 -->
+                    <div class="feature-grid-card">
+                        <img src="/assests/input_extraction.png" alt="Extraction visual icon" class="feature-card-icon">
+                        <h4>Accurate extraction</h4>
+                        <p class="short-desc">Merchant, amount, method — pulled automatically.</p>
+                        <p class="extended-desc">Our AI intelligently extracts merchant names, transaction amounts, payment methods, and categories from any input format without manual entry.</p>
+                    </div>
+                    <!-- Feature Card 3 -->
+                    <div class="feature-grid-card">
+                        <img src="/assests/categorization.png" alt="Categorization chart icon" class="feature-card-icon">
+                        <h4>Smart categories</h4>
+                        <p class="short-desc">Clean charts and reports, without manual cleanup.</p>
+                        <p class="extended-desc">Automatically organize expenses into meaningful categories. Get instant insights through visual charts and detailed reports that help you understand spending patterns.</p>
+                    </div>
+                    <!-- Feature Card 4 -->
+                    <div class="feature-grid-card">
+                        <img src="/assests/privacy.png" alt="Privacy lock icon" class="feature-card-icon">
+                        <h4>Private by default</h4>
+                        <p class="short-desc">Your data stays yours. Built with security in mind.</p>
+                        <p class="extended-desc">Your financial data is encrypted and stored securely. You have complete control to review, edit, export, or delete your information at any time.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 5: Built for Everyone (Bento Grid) -->
+            <div class="built-for-everyone-section">
+                <div class="section-header">
+                    <h2>Built for everyone</h2>
+                </div>
+
+                <!-- Bento Layout Grid -->
+                <div class="bento-grid">
+                    <!-- Bento Card 1 -->
+                    <div class="bento-card">
+                        <img src="/assests/studet_image.png" alt="Students managing budgets" class="bento-card-img">
+                        <div class="bento-card-content">
+                            <h3>STUDENTS</h3>
+                            <p>Track daily expenses, manage pocket money, and stay on budget effortlessly.</p>
+                        </div>
+                    </div>
+                    <!-- Bento Card 2 -->
+                    <div class="bento-card">
+                        <img src="/assests/everyday_person.png" alt="Family managing expenses" class="bento-card-img">
+                        <div class="bento-card-content">
+                            <h3>EVERYDAY USERS</h3>
+                            <p>Monitor household spending, bills, and personal finances in one place.</p>
+                        </div>
+                    </div>
+                    <!-- Bento Card 3 -->
+                    <div class="bento-card">
+                        <img src="/assests/account_tracker.png" alt="Professional ledger summary screen" class="bento-card-img">
+                        <div class="bento-card-content">
+                            <h3>ACCOUNT TRACKERS</h3>
+                            <p>Maintain detailed records, analyze patterns, and export data for reporting.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 6: CTA Section -->
+            <div class="cta-section">
+                <div class="cta-banner">
+                    <h2>Ready to take control?</h2>
+                    <p class="cta-subtitle">Start tracking smarter, not harder.</p>
+                    <a href="#chat" class="btn primary btn-cta-main">Get Started Free</a>
+                </div>
+
+                <!-- 3-Column CTA Highlights -->
+                <div class="cta-features-grid">
+                    <!-- Highlight 1 -->
+                    <div class="cta-feature">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                            <polyline points="2 17 12 22 22 17"></polyline>
+                            <polyline points="2 12 12 17 22 12"></polyline>
+                        </svg>
+                        <h3>Multi-Modal Input</h3>
+                        <p>Text, voice, or images. UPI screenshots supported.</p>
+                    </div>
+                    <!-- Highlight 2 -->
+                    <div class="cta-feature">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <h3>Real-Time Processing</h3>
+                        <p>AI categorization with instant insights.</p>
+                    </div>
+                    <!-- Highlight 3 -->
+                    <div class="cta-feature">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <h3>Bank-Level Security</h3>
+                        <p>Encrypted and private. Never shared.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 7: FAQ Section (CSS Accordion using Details/Summary) -->
+            <div class="faq-section">
+                <div class="section-header">
+                    <h2>Frequently Asked Questions</h2>
+                </div>
+
+                <div class="faq-accordion-container">
+                    <details class="faq-item">
+                        <summary class="faq-question">How does Fold automatically track my expenses? <span class="faq-arrow"></span></summary>
+                        <div class="faq-answer">
+                            <p>Fold integrates localized artificial intelligence engines like PaddleOCR (for reading details from uploaded invoice images or UPI transaction screenshot photos), Whisper (for transcribing voice note audio), and scikit-learn/transformers NLP model pipelines to automatically extract merchant, amount, payment method, and categories without manual data entry.</p>
+                        </div>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary class="faq-question">Does Fold support Hinglish or local language inputs? <span class="faq-arrow"></span></summary>
+                        <div class="faq-answer">
+                            <p>Yes. Fold is tailor-made for Indian users. It utilizes a custom trained scikit-learn intent classifier and Named Entity Recognition parser capable of extracting parameters from Hinglish phrases like "Swiggy se 450 ka food order kiya UPI se" or "auto wale ko 50 cash diya".</p>
+                        </div>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary class="faq-question">Is my financial data secure and private? <span class="faq-arrow"></span></summary>
+                        <div class="faq-answer">
+                            <p>Absolutely. Your privacy is our top priority. All uploaded assets are processed secure and stored within database layers protected by Clerk authentication gates. Your data is only visible to you, and we do not sell or share your transaction records with third parties.</p>
+                        </div>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary class="faq-question">How do I connect my bank accounts? <span class="faq-arrow"></span></summary>
+                        <div class="faq-answer">
+                            <p>You can add bank institutions (e.g. HDFC, SBI Savings), credit cards, or cash wallets from the 🏦 Accounts tab. Our AI engines scan transaction references (like the last 4 digits of cards or bank names in messages) to map them to your designated bank accounts automatically.</p>
+                        </div>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary class="faq-question">Can I export my data? <span class="faq-arrow"></span></summary>
+                        <div class="faq-answer">
+                            <p>Yes. You can review all transaction data inside the 📋 Transactions history panel and view aggregated insights inside the 📊 Reports page. All data can be extracted or exported easily for personal budgeting analyses.</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+            <!-- SECTION 8: Footer -->
+            <footer class="landing-footer">
+                <div class="footer-grid-layout">
+                    <div class="footer-brand-col">
+                        <h3>Fold AI</h3>
+                        <p class="footer-subtext">The next-generation multimodal ledger built for India.</p>
+                    </div>
+                    <div class="footer-links-col">
+                        <h4>Product</h4>
+                        <a href="#chat">Add Chat</a>
+                        <a href="#transactions">History</a>
+                        <a href="#reports">Analytics</a>
+                    </div>
+                    <div class="footer-links-col">
+                        <h4>Security</h4>
+                        <a href="#landing">Privacy Policy</a>
+                        <a href="#landing">Terms of Service</a>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2026 Fold AI. All rights reserved. Built with pure HTML/CSS/JS.</p>
+                </div>
+            </footer>
+
         </section>
     </template>
 

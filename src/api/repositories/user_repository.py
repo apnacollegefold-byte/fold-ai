@@ -6,9 +6,9 @@ _logger = logging.getLogger(__name__)
 
 def get_or_create_user_from_clerk(
     clerk_user_id: str,
-    email,
-    full_name,
-    avatar_url,
+    email: str | None = None,
+    full_name: str | None = None,
+    avatar_url: str | None = None,
 ) -> dict:
 
     with get_db_connection() as conn:

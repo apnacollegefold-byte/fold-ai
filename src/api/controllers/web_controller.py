@@ -1,5 +1,5 @@
 from datetime import datetime
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from api.middleware.clerk_auth import get_current_user
 from api.repositories.ledger_repository import get_report_window_summary, get_breakdown
 from api.services import ledger_service
@@ -75,6 +75,40 @@ async def get_transactions(
         "limit": limit,
         "offset": offset,
     }
+
+@router.get("/accounts")
+async def get_accounts(user: dict = Depends(get_current_user)):
+    accounts = ledger_service.list_accounts(user["user_ref"])
+    return {"accounts": accounts}
+
+
+@router.post("/accounts")
+async def create_account(
+    user: dict = Depends(get_current_user),
+    name: str = Body(...),
+    account_type: str = Body(...),
+    institution_name: str | None = Body(default=None),
+    account_number_last4: str | None = Body(default=None),
+    opening_balance: float | None = Body(default=None),
+):
+    try:
+        account = ledger_service.upsert_account(
+            user_ref=user["user_ref"],
+            name=name,
+            account_type=account_type,
+            institution_name=institution_name,
+            account_number_last4=account_number_last4,
+        )
+        if opening_balance and opening_balance > 0:
+            ledger_service.post_opening_balance(
+                user_ref=user["user_ref"],
+                source="account_creation",
+                account_name=name,
+                amount=opening_balance,
+            )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {"account": account}
 
 def _serialize(t: dict) -> dict:
     """Ensure all values are JSON-serializable."""

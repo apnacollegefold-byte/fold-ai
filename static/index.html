@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -159,13 +160,37 @@
                     <option value="weekly">Last 7 Days</option>
                 </select>
                 <button id="report-refresh" class="btn secondary">Refresh</button>
+                <button id="report-download-pdf" class="btn primary">Download PDF</button>
             </div>
             <div id="report-loading" class="loading-text">Loading report…</div>
             <div id="report-content" style="display:none;">
                 <div class="summary-cards" id="summary-cards"></div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 2rem 0;">
+                    <div class="chart-card">
+                        <h3>Spending by Category</h3>
+                        <canvas id="chart-category"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Payment Methods</h3>
+                        <canvas id="chart-payment"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card" style="margin: 2rem 0;">
+                    <h3>Income vs Expense</h3>
+                    <canvas id="chart-income-expense"></canvas>
+                </div>
+                <div class="chart-card" style="margin: 2rem 0;">
+                    <h3>Account Balances</h3>
+                    <canvas id="chart-accounts"></canvas>
+                </div>
+                <div class="breakdown-section">
+                    <h3>Recent Transactions</h3>
+                    <div id="report-recent-tx"></div>
+                </div>
             </div>
         </section>
     </template>
+
 
     <!-- Entry point -->
     <script type="module" src="/js/main.js"></script>
